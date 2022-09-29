@@ -1,0 +1,95 @@
+<!DOCTYPE HTML>
+<html xmlns:th="http://www.thymeleaf.org">
+<head>
+    <title>Tests</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+          integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.5.0/font/bootstrap-icons.css">
+    <style>
+        .input-group {
+            max-width: 600px;
+        }
+
+        .logout {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+        }
+    </style>
+</head>
+<body>
+<form th:action="@{/api/quiz/generationTest/{uuid}(uuid=${test.getUuid()})}" class="form-horizontal"
+      method="get">
+
+    <div class="container">
+        <div class="row">
+
+            <div class="col-md-12">
+                <h1> <span th:text="${test.getName()}"></span></h1>
+                <div class="logout">
+                    <a type="button" href="#" th:href="@{/logout}" class="btn btn-danger">Выход</a>
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col-md-6">
+                <a class="btn btn-info" href="#" th:href="@{/api/quiz/findAll}">Вернуться ко всем тестам</a>
+                <br>
+                <span class="pull-right">
+                    <input type="submit" id="submitButton" class="btn btn-success"  value="Генерация">
+                        <input type="reset" id="resetButton" class="btn btn-danger"  value="Сброс">
+					</span>
+                <table class="table">
+                    <thead>
+                    <tr>
+                        <th> Количество вариантов</th>
+                        <th> Количество вопросов в тесте</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr>
+                        <td><input class="input-range" type="text" maxlength="2"
+                                   onkeyup="this.value = this.value.replace(/[^{0-9}]/g,'');"
+                                   placeholder="1-24"
+                                   th:field="${param.variantLimit}"
+                                   required/></td>
+                        <td><input class="input-range" type="text" maxlength="1"
+                                   onkeyup="this.value = this.value.replace(/[^{1-9}]/g,'');"
+                                   placeholder="Введите число необходимых заданий в варианте"
+                                   th:field="${param.questionLimit}"
+                                   required/></td>
+                    </tr>
+                    </tbody>
+                </table>
+                <table class="table" align="center">
+                    <thead>
+                    <tr>
+                        <th> Время генерации</th>
+                        <th> Количество вариантов</th>
+                        <th> Количество вопросов в варианте</th>
+                    </tr>
+                    </thead>
+                    <tbody>
+                    <tr th:if="${generatedInfoList.isEmpty()}">
+                        <td colspan="2">Нет сгенерированных тестов</td>
+                    </tr>
+                    <tr th:each="generatedInfo : ${generatedInfoList}">
+                        <td><span th:text="*{generatedInfo.getGeneratedTimestamp()}"> Время генерации</span></td>
+                        <td><span th:text="*{generatedInfo.getCountOfVariant()}"> Количество вариантов<</span></td>
+                        <td><span th:text="*{generatedInfo.getCountOfQuestionInVar()}">Количество вопросов в варианте </span></td>
+                        <td>
+                        <a th:href="@{/api/quiz/files/docx/questions/{uuid}/{timestamp}(uuid=${test.getUuid()},timestamp=${generatedInfo.getGeneratedTimestamp()})}" class="btn btn-primary">Скачать тест</a>
+                        </td>
+                        <td>
+                        <a th:href="@{/api/quiz/files/docx/answers/{uuid}/{timestamp}(uuid=${test.getUuid()},timestamp=${generatedInfo.getGeneratedTimestamp()})}" class="btn btn-primary">Скачать ответы</a>
+                        </td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</form>
+</body>
+</html>
